@@ -1060,3 +1060,39 @@ video {
   transform: rotate(90deg);
   opacity: 1;
 }
+/* --- Icône lumineuse TRON pour les sections ouvertes --- */
+
+/* Positionne l’icône à droite du titre */
+.collapsible-label {
+  position: relative;
+  padding-right: 18px;
+}
+
+/* Le petit cercle lumineux */
+.collapsible-label::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0, 229, 255, 0.25); /* discret quand fermé */
+  box-shadow: 0 0 4px rgba(0, 229, 255, 0.4);
+  transition: 0.25s ease-out;
+}
+
+/* Mode ouvert = halo Tron plus puissant */
+.loader-section.open .collapsible-label::after {
+  background: rgba(255, 68, 0, 0.9);
+  box-shadow: 0 0 10px rgba(255, 68, 0, 0.9), 0 0 18px rgba(0, 212, 255, 0.9);
+  transform: translateY(-50%) scale(1.25);
+}
+/* Masquer le banner TRON en mode portrait mobile */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .top-bar-banner,
+  .banner-img {
+    display: none !important;
+  }
+}
