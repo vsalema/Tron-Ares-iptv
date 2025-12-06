@@ -343,7 +343,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--tron-muted);
-  margin-bottom: 2px;
+  margin-bottom: 27px;
 }
 
 .loader-row {
