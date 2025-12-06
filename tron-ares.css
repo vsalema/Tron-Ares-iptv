@@ -1146,3 +1146,59 @@ video {
     height: 150px;
   }
 }
+/* Mode compact pour petits écrans en hauteur (ex: mobile paysage) */
+@media screen and (max-height: 500px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;            /* plus de scroll global */
+  }
+
+  body {
+    align-items: stretch;
+  }
+
+  .app-shell {
+    margin: 0;
+    border-radius: 0;
+    height: 100dvh;              /* utilise la hauteur visible réelle sur mobile */
+  }
+
+  .main {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  /* On enlève le banner pour gagner de la hauteur */
+  .top-bar-banner,
+  .banner-img {
+    display: none !important;
+  }
+
+  .top-bar {
+    margin-bottom: 2px;
+  }
+
+  .player-shell {
+    min-height: 0;
+    flex: 1;                     /* prend tout l’espace dispo */
+    aspect-ratio: 16 / 9;
+  }
+
+  .bottom-bar {
+    padding: 4px 6px;
+    border-radius: 10px;
+  }
+
+  .helper-text {
+    display: none;               /* petit gain de place en bas */
+  }
+
+  /* PiP plus petit pour ne pas dépasser */
+  .player-shell.pip-mode {
+    right: 6px;
+    bottom: 6px;
+    width: 240px;
+    height: 140px;
+  }
+}
