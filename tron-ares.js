@@ -751,6 +751,16 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     }
   });
 });
+// Sections repliables du loader-panel
+document.querySelectorAll('.loader-section .collapsible-label').forEach(label => {
+  label.addEventListener('click', () => {
+    const section = label.closest('.loader-section');
+    section.classList.toggle('open');
+  });
+});
+
+// (optionnel) ouvrir automatiquement seulement la première section au départ
+// document.querySelector('.loader-section[data-section="playlist"]')?.classList.add('open');
 
 // Sidebar show/hide
 toggleSidebarBtn.addEventListener('click', () => {

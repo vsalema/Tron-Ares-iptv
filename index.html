@@ -41,9 +41,16 @@
       <div class="list" id="iframeList"></div>
       <div class="list" id="favoriteList"></div>
     </div>
+<div class="loader-panel">
 
-    <div class="loader-panel">
-      <div class="loader-label">Charger une playlist ou une source</div>
+  <!-- SECTION 1 : Charger une playlist ou une source -->
+  <div class="loader-section" data-section="playlist">
+    <div class="loader-label collapsible-label">
+      <span>Charger une playlist ou une source</span>
+      <span class="loader-toggle-icon">▸</span>
+    </div>
+
+    <div class="loader-section-body">
       <div class="loader-row">
         <input id="urlInput" class="input" placeholder="URL d'un flux ou d'une playlist M3U…" />
         <button class="btn btn-ghost" id="loadUrlBtn">Charger</button>
@@ -61,7 +68,7 @@
         <span id="fileNameLabel">Aucun fichier sélectionné</span>
       </div>
 
-      <div class="loader-label">Ajouter un overlay iFrame</div>
+      <div class="loader-label" style="margin-top:4px;">Ajouter un overlay iFrame</div>
       <div class="loader-row">
         <input id="iframeTitleInput" class="input" placeholder="Titre overlay / site / widget…" />
       </div>
@@ -69,8 +76,17 @@
         <input id="iframeUrlInput" class="input" placeholder="URL iFrame ou vidéo YouTube…" />
         <button class="btn btn-accent" id="addIframeBtn">+ Ajouter</button>
       </div>
+    </div>
+  </div>
 
-      <div class="loader-label">JSON M3U / iFrame</div>
+  <!-- SECTION 2 : JSON M3U / iFrame -->
+  <div class="loader-section" data-section="json">
+    <div class="loader-label collapsible-label">
+      <span>JSON M3U / iFrame</span>
+      <span class="loader-toggle-icon">▸</span>
+    </div>
+
+    <div class="loader-section-body">
       <div class="loader-row">
         <button class="btn btn-ghost" id="exportM3uJsonBtn">Export M3U → JSON</button>
         <button class="btn btn-ghost" id="exportIframeJsonBtn">Export iFrame → JSON</button>
@@ -84,6 +100,11 @@
                   placeholder="Colle ici le JSON à importer, ou regarde le JSON exporté…"></textarea>
       </div>
     </div>
+  </div>
+
+</div>
+
+    
   </aside>
 
   <!-- Main: player -->
