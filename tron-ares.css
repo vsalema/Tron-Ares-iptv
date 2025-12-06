@@ -513,7 +513,7 @@ body.theme-redblue .banner-img {
   box-shadow: var(--shadow-neon);
   transition: var(--transition-fast);
   overflow: hidden;
-  gap: 4px;
+  gap: 65px;
 }
 
 .toggle-sidebar-btn:hover {
