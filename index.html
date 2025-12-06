@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tron Ares IPTV Player</title>
+
+  <!-- Police futuriste -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- HLS & DASH -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js"></script>
+
+  <link rel="stylesheet" href="tron-ares.css">
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <!-- Sidebar: playlists -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Playlist Grid</div>
+      <div class="status-pill" id="statusPill">Idle</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="channels">
+        <span>●</span> Chaînes M3U
+      </button>
+      <button class="tab-btn" data-tab="iframes">
+        <span>■</span> Overlays / iFrame
+      </button>
+      <button class="tab-btn" data-tab="favorites">
+        <span>★</span> Favoris
+      </button>
+    </div>
+
+    <div class="lists-container">
+      <div class="scroll-fade"></div>
+      <div class="list active" id="channelList"></div>
+      <div class="list" id="iframeList"></div>
+      <div class="list" id="favoriteList"></div>
+    </div>
+
+    <div class="loader-panel">
+      <div class="loader-label">Charger une playlist ou une source</div>
+      <div class="loader-row">
+        <input id="urlInput" class="input" placeholder="URL d'un flux ou d'une playlist M3U…" />
+        <button class="btn btn-ghost" id="loadUrlBtn">Charger</button>
+      </div>
+      <div class="loader-subrow">
+        <span>HTTP(S), M3U, HLS, MP4, MP3, YouTube…</span>
+      </div>
+
+      <div class="loader-row">
+        <input type="file" id="fileInput" class="file-input"
+               accept=".m3u,.m3u8,.mp4,.mp3,.mpd,.ts,.aac,.flv,.mov,video/*,audio/*" />
+        <button class="btn btn-ghost" id="openFileBtn">Ouvrir un fichier local</button>
+      </div>
+      <div class="loader-subrow">
+        <span id="fileNameLabel">Aucun fichier sélectionné</span>
+      </div>
+
+      <div class="loader-label">Ajouter un overlay iFrame</div>
+      <div class="loader-row">
+        <input id="iframeTitleInput" class="input" placeholder="Titre overlay / site / widget…" />
+      </div>
+      <div class="loader-row">
+        <input id="iframeUrlInput" class="input" placeholder="URL iFrame ou vidéo YouTube…" />
+        <button class="btn btn-accent" id="addIframeBtn">+ Ajouter</button>
+      </div>
+
+      <div class="loader-label">JSON M3U / iFrame</div>
+      <div class="loader-row">
+        <button class="btn btn-ghost" id="exportM3uJsonBtn">Export M3U → JSON</button>
+        <button class="btn btn-ghost" id="exportIframeJsonBtn">Export iFrame → JSON</button>
+      </div>
+      <div class="loader-row">
+        <button class="btn btn-accent" id="importJsonBtn">Importer JSON</button>
+      </div>
+      <div class="loader-row">
+        <textarea id="jsonArea" class="input"
+                  style="height:80px; resize:vertical; font-family:monospace; border-radius:12px;"
+                  placeholder="Colle ici le JSON à importer, ou regarde le JSON exporté…"></textarea>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main: player -->
+  <main class="main">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <!-- tu peux mettre des infos ici plus tard si tu veux -->
+      </div>
+
+      <!-- Banner tron Ares centré (ne change pas la hauteur) -->
+      <div class="top-bar-banner">
+        <img src="https://vsalema.github.io/tvpt4/css/ChatGPT Image 6 déc. 2025, 19_05_13.png"
+             alt="Tron Ares IPTV Player"
+             class="banner-img">
+      </div>
+
+      <div class="top-bar-right">
+        <button class="btn btn-ghost" id="themeToggleBtn">Thème : Cyan/Orange</button>
+        <button class="btn btn-ghost" id="fxToggleBtn">FX Tron+</button>
+        <button class="btn btn-ghost" id="pipToggleBtn">PiP</button>
+        <button class="btn btn-ghost" id="toggleOverlayBtn">Vidéo / iFrame</button>
+        <button class="btn btn-ghost" id="fullPageBtn">Plein écran</button>
+        <button class="toggle-sidebar-btn" id="toggleSidebarBtn" aria-label="Menu sidebar">
+          <span class="burger-left">☰</span>
+          <span class="burger-center"></span>
+          <span class="burger-right">☰</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="player-shell player-grid-lines" id="playerContainer">
+      <div class="player-inner">
+        <video id="videoEl" controls preload="metadata"></video>
+        <div class="iframe-overlay hidden" id="iframeOverlay">
+          <iframe id="iframeEl" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bottom-bar">
+      <button class="nav-btn" id="prevBtn">
+        <span class="nav-label-arrow">◀</span>
+        Prev
+      </button>
+
+      <div class="now-playing" id="nowPlaying">
+        <div class="np-logo" id="npLogo"></div>
+        <div class="np-text">
+          <div class="np-title" id="npTitle">Aucune chaîne sélectionnée</div>
+          <div class="np-sub" id="npSub">Choisissez une chaîne dans la liste</div>
+        </div>
+        <div class="np-badge" id="npBadge">IDLE</div>
+      </div>
+
+      <button class="nav-btn" id="nextBtn">
+        Next
+        <span class="nav-label-arrow">▶</span>
+      </button>
+
+      <div class="helper-text">
+        Next / Prev changent la chaîne <span>M3U</span> active.
+      </div>
+    </footer>
+  </main>
+</div>
+
+<script src="tron-ares.js"></script>
+</body>
+</html>
