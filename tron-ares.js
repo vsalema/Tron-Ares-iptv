@@ -915,7 +915,7 @@ videoEl.addEventListener('error', () => {
         id: 'demo-2',
         name: 'SICN',
         url: 'https://cdnapisec.kaltura.com/p/4526593/sp/4526593/playManifest/entryId/1_j8ztwihx/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8',
-         logo: { type: 'image', value: 'https://pt.wikipedia.org/wiki/SIC_Not%C3%ADcias#/media/Ficheiro:SIC_Not%C3%ADcias_(2023).svg' },
+         logo: { type: 'image', value: 'https://vsalema.github.io/tvpt4/css/SICNoticias.png' },
         group: 'TV',
         isIframe: false,
         isFavorite: false,
