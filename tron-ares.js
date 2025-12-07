@@ -950,15 +950,7 @@ videoEl.addEventListener('error', () => {
       isFavorite: false,
     };
 
-    const demoIframe = {
-      id: 'demo-iframe',
-      name: 'Tony Carreira - 30 Anos de Canções Altice Arena',
-      url: 'https://www.youtube.com/embed/efd0qSgR06k?autoplay=1&mute=0',
-      logo: { type: 'image', value: 'https://yt3.googleusercontent.com/600ktvDAxGK71vvfBsBVIVwk66FOKKWuztuZayMnS5x0ysHqCyFQdc5CUT09frMHQhYDsuQXYg=s160-c-k-c0x00ffffff-no-rj' },
-      group: 'Demo Overlay',
-      isIframe: true,
-      isFavorite: false,
-    };
+  
     
     demoChannels.forEach(ch => channels.push(ch));
     iframeItems.push(demoIframe);
