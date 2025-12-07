@@ -724,6 +724,7 @@ function importFromJson() {
         isFavorite: !!item.isFavorite
       };
       iframeItems.push(entry);
+      
     });
     renderLists();
     setStatus('Import JSON iFrame terminé (' + data.items.length + ' entrées)');
@@ -950,10 +951,42 @@ videoEl.addEventListener('error', () => {
       isFavorite: false,
     };
 
-  
+  const demoIframe2 = {
+  id: 'demo-iframe-2',
+  name: 'RTP Player Externe',
+  url: 'https://vsalema.github.io/play/?https://streaming-live.rtp.pt/liverepeater/smil:rtp1HD.smil/playlist.m3u8',
+  logo: { type: 'image', value: 'https://vsalema.github.io/StreamPilot-X-Studio-O/logos/rtp1.jpg' },
+  group: 'Demo Overlay',
+  isIframe: true,
+  isFavorite: false
+};
+
+const demoIframe3 = {
+  id: 'demo-iframe-3',
+  name: 'Wikipedia',
+  url: 'https://www.wikipedia.org',
+  logo: deriveLogoFromName('W'),
+  group: 'Demo Overlay',
+  isIframe: true,
+  isFavorite: false
+};
+
+const demoIframe4 = {
+  id: 'demo-iframe-4',
+  name: 'YouTube Autoplay',
+  url: 'https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1',
+  logo: deriveLogoFromName('Y'),
+  group: 'Demo Overlay',
+  isIframe: true,
+  isFavorite: false
+};
+
     
     demoChannels.forEach(ch => channels.push(ch));
     iframeItems.push(demoIframe);
+    iframeItems.push(demoIframe2);
+    iframeItems.push(demoIframe3);
+    iframeItems.push(demoIframe4);
     renderLists();
     updateNowPlaying(null, 'IDLE');
   })();
