@@ -913,9 +913,9 @@ videoEl.addEventListener('error', () => {
       },
        {
         id: 'demo-2',
-        name: 'M6',
-        url: 'https://vsalema.github.io/m66/?https://tvradiozap.eu/tools/np-m3u8.php/m6hd',
-         logo: { type: 'image', value: '' },
+        name: 'SICN',
+        url: 'https://cdnapisec.kaltura.com/p/4526593/sp/4526593/playManifest/entryId/1_j8ztwihx/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8',
+         logo: { type: 'image', value: 'https://pt.wikipedia.org/wiki/SIC_Not%C3%ADcias#/media/Ficheiro:SIC_Not%C3%ADcias_(2023).svg' },
         group: 'TV',
         isIframe: true,
         isFavorite: false,
