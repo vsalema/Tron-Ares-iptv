@@ -914,7 +914,7 @@ videoEl.addEventListener('error', () => {
       {
         id: 'demo-2',
         name: 'RTP1',
-        url: 'https://vsalema.github.io/play/?https://streaming-live.rtp.pt/liverepeater/smil:rtp1HD.smil/playlist.m3u8',
+        url: 'https://streaming-live.rtp.pt/liverepeater/smil:rtp1HD.smil/playlist.m3u8',
          logo: { type: 'image', value: 'https://vsalema.github.io/StreamPilot-X-Studio-O/logos/rtp1.jpg' },
         group: 'TV',
         isIframe: true,
