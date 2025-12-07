@@ -992,7 +992,7 @@ const demoIframe5 = {
   const demoIframe6 = {
   id: 'demo-iframe-6',
   name: 'Radio Alfa',
-  url: 'https://n32a-eu.rcs.revma.com/amrbkhqtkm0uv?rj-ttl=5&rj-tok=AAABmqMYXjQAwgI6eJQzoCwBDw',
+  url: 'https://vsalema.github.io/ipodfm/',
   logo: { type: 'image', value: 'https://vsalema.github.io/ipodfm/img/Radio_Alfa.png' },
   group: 'Radio',
   isIframe: true,
