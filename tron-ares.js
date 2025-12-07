@@ -959,6 +959,7 @@ videoEl.addEventListener('error', () => {
       isFavorite: false,
     };
     
+{
     
     
     demoChannels.forEach(ch => channels.push(ch));
