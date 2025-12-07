@@ -980,13 +980,31 @@ const demoIframe4 = {
   isIframe: true,
   isFavorite: false
 };
-
-    
+const demoIframe5 = {
+  id: 'demo-iframe-5',
+  name: 'Météo Paris',
+  url: 'https://forecast7.com/en/48d86n2d35/paris/',
+  logo: deriveLogoFromName('P'),
+  group: 'Météo',
+  isIframe: true,
+  isFavorite: false
+};
+  const demoIframe6 = {
+  id: 'demo-iframe-6',
+  name: 'Radio Alfa',
+  url: 'https://n32a-eu.rcs.revma.com/amrbkhqtkm0uv?rj-ttl=5&rj-tok=AAABmqMYXjQAwgI6eJQzoCwBDw',
+  logo: { type: 'image', value: 'https://vsalema.github.io/ipodfm/img/Radio_Alfa.png' },
+  group: 'Radio',
+  isIframe: true,
+  isFavorite: false
+};  
     demoChannels.forEach(ch => channels.push(ch));
     iframeItems.push(demoIframe);
     iframeItems.push(demoIframe2);
     iframeItems.push(demoIframe3);
     iframeItems.push(demoIframe4);
+    iframeItems.push(demoIframe5);
+    iframeItems.push(demoIframe5);
     renderLists();
     updateNowPlaying(null, 'IDLE');
   })();
