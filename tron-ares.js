@@ -911,7 +911,16 @@ videoEl.addEventListener('error', () => {
         isIframe: true,
         isFavorite: false,
       },
-      {
+       {
+        id: 'demo-2',
+        name: 'M6',
+        url: 'https://vsalema.github.io/m66/?https://tvradiozap.eu/tools/np-m3u8.php/m6hd',
+         logo: { type: 'image', value: '' },
+        group: 'TV',
+        isIframe: true,
+        isFavorite: false,
+      },
+       {
         id: 'demo-2',
         name: 'RTP1',
         url: 'https://streaming-live.rtp.pt/liverepeater/smil:rtp1HD.smil/playlist.m3u8',
