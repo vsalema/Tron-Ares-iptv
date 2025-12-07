@@ -228,8 +228,8 @@ body {
 }
 
 .channel-logo {
-  width: 32px;
-  height: 32px;
+  width: 60px;
+  height: 33px;
   border-radius: 999px;
   background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.9));
   display: flex;
@@ -769,8 +769,8 @@ video {
 }
 
 .np-logo {
-  width: 30px;
-  height: 30px;
+  width: 60px;
+  height: 33px;
   border-radius: 999px;
   border: 1px solid rgba(255, 145, 0, 0.7);
   display: flex;
