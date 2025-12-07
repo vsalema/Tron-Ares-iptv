@@ -949,18 +949,16 @@ videoEl.addEventListener('error', () => {
       isIframe: true,
       isFavorite: false,
     };
-{
+
+    const demoIframe = {
       id: 'demo-iframe',
-      name: 'The Weeknd LIVE After Hours Til Dawn Tour 2025 NIGHT 2 of 4 (Los Angeles,CA)',
-      url: 'https://www.youtube.com/embed/AgSZC-Ejiik?autoplay=1&mute=0',
-      logo: { type: 'image', value: 'https://i.ytimg.com/vi/AgSZC-Ejiik/hqdefault_30000.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLD2WW7vOz09yJZir-b5ikYjGVkbhQ' },
+      name: 'Tony Carreira - 30 Anos de Canções Altice Arena',
+      url: 'https://www.youtube.com/embed/efd0qSgR06k?autoplay=1&mute=0',
+      logo: { type: 'image', value: 'https://yt3.googleusercontent.com/600ktvDAxGK71vvfBsBVIVwk66FOKKWuztuZayMnS5x0ysHqCyFQdc5CUT09frMHQhYDsuQXYg=s160-c-k-c0x00ffffff-no-rj' },
       group: 'Demo Overlay',
       isIframe: true,
       isFavorite: false,
     };
-    
-{
-    
     
     demoChannels.forEach(ch => channels.push(ch));
     iframeItems.push(demoIframe);
