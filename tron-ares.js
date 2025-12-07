@@ -1004,7 +1004,7 @@ const demoIframe5 = {
     iframeItems.push(demoIframe3);
     iframeItems.push(demoIframe4);
     iframeItems.push(demoIframe5);
-    iframeItems.push(demoIframe5);
+    iframeItems.push(demoIframe6);
     renderLists();
     updateNowPlaying(null, 'IDLE');
   })();
