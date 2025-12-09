@@ -852,7 +852,7 @@ document.querySelectorAll('.loader-section .collapsible-label').forEach(label =>
 });
 
 // (optionnel) ouvrir par défaut la section playlist
-document.querySelector('.loader-section[data-section="playlist"]')?.classList.add('open');
+document.querySelector('.loader-section[data-section="playlist"]')?.classList.add('close');
 
 // Sidebar show/hide
 toggleSidebarBtn.addEventListener('click', () => {
