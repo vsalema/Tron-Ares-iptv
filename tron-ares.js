@@ -995,7 +995,7 @@ videoEl.addEventListener('error', () => {
 // =====================================================
 
 (function seedDemo() {
-  //const demoChannels = [
+ /* const demoChannels = [
     {
       id: 'demo-1',
       name: 'CMTV',
@@ -1018,7 +1018,7 @@ videoEl.addEventListener('error', () => {
     }
   ];
 
-  demoChannels.forEach(ch => channels.push(ch));
+  demoChannels.forEach(ch => channels.push(ch)); */
 
   // Overlays custom
   const customOverlays = [
