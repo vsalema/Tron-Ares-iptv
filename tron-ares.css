@@ -265,6 +265,32 @@ body {
   display: block;
 }
 
+.channel-logo {
+  width: 60px;
+  height: 33px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 229, 255, 0.55);
+  box-shadow: var(--shadow-neon);
+  font-size: 15px;
+  color: var(--tron-text);
+  /* <<< AJOUTE ÇA */
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+/* Zoom logo seulement dans la liste principale channels */
+#channelList .channel-item:hover .channel-logo {
+  transform: scale(2.12);
+  box-shadow: var(--shadow-neon-amber);
+  border-color: var(--tron-accent);
+}
+
+
 .channel-meta {
   flex: 1;
   min-width: 0;
@@ -1197,5 +1223,13 @@ body.theme-redblue .np-logo img {
       drop-shadow(0 0 8px rgba(41,121,255,0.8))
       drop-shadow(0 0 14px rgba(41,121,255,0.5));
   }
+}
+/* Zoom spécial films : scale 2.12 + décalage vers la droite */
+#channelList .channel-item:hover .channel-logo {
+  transform: scale(2.12) translateX(18px); /* <<< zoom + pousser à droite */
+  transform-origin: left center;           /* le zoom part du côté gauche */
+  box-shadow: var(--shadow-neon-amber);
+  border-color: var(--tron-accent);
+  z-index: 5;                              /* reste au-dessus */
 }
 
