@@ -995,7 +995,7 @@ videoEl.addEventListener('error', () => {
 // =====================================================
 
 (function seedDemo() {
-  const demoChannels = [
+  //const demoChannels = [
     {
       id: 'demo-1',
       name: 'CMTV',
