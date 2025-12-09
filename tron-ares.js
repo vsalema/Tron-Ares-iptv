@@ -1070,6 +1070,6 @@ videoEl.addEventListener('error', () => {
 // =====================================================
 
 (async function loadMainPlaylists() {
-  await loadFromUrl("https://vsalema.github.io/tvpt4/css/TVradioZap-TV-Europe+_s_2024-12-27.m3u");
+  await loadFromUrl("https://vsalema.github.io/tvpt4/css/playlist_par_genre.m3u");
   await loadFrM3u("https://vsalema.github.io/tvpt4/css/playlist-tvf-r.m3u");
 })();
