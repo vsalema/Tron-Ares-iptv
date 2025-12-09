@@ -3,6 +3,15 @@
 // =====================================================
 
 // --------- DATA MODEL ---------
+let resumePositions = {};
+
+try {
+  const saved = localStorage.getItem('tronAresResume');
+  if (saved) resumePositions = JSON.parse(saved);
+} catch {
+  resumePositions = {};
+}
+
 const channels = [];      // Liste M3U principale
 const frChannels = [];    // Liste M3U FR
 const iframeItems = [];   // Overlays / iFrames
@@ -423,6 +432,26 @@ function playUrl(entry) {
       modeLabel = 'VIDEO';
     }
   }
+// Reprise lecture seulement si on vient de channelList
+videoEl.onloadedmetadata = () => {
+  try {
+    if (currentListType !== "channels") return; // <<< restriction ici
+
+    const key = entry.url;
+    const savedPos = resumePositions[key];
+
+    if (
+      typeof savedPos === "number" &&
+      savedPos > 10 &&
+      isFinite(videoEl.duration) &&
+      savedPos < videoEl.duration - 5
+    ) {
+      videoEl.currentTime = savedPos;
+    }
+  } catch (e) {
+    console.warn("Erreur reprise position", e);
+  }
+};
 
   videoEl.play().catch(() => {});
   updateNowPlaying(entry, modeLabel);
@@ -989,13 +1018,36 @@ videoEl.addEventListener('error', () => {
   npBadge.textContent = 'ERREUR';
   console.error('Video error', mediaError);
 });
+videoEl.addEventListener("timeupdate", () => {
+  if (currentListType !== "channels") return; // <<< seulement liste channels
+  if (!currentEntry) return;
+
+  const key = currentEntry.url;
+
+  // Pas utile pour les flux live
+  if (!videoEl.duration || !isFinite(videoEl.duration) || videoEl.duration < 60) return;
+
+  const t = videoEl.currentTime;
+  if (t < 10) return;
+
+  // Si le film est presque fini → on supprime la mémoire
+  if (videoEl.duration - t < 20) {
+    delete resumePositions[key];
+    localStorage.setItem('tronAresResume', JSON.stringify(resumePositions));
+    return;
+  }
+
+  // Sauvegarde normale
+  resumePositions[key] = t;
+  localStorage.setItem('tronAresResume', JSON.stringify(resumePositions));
+});
 
 // =====================================================
 // DEMO DE BASE + OVERLAYS CUSTOM
 // =====================================================
 
 (function seedDemo() {
- /* const demoChannels = [
+  /* const demoChannels = [
     {
       id: 'demo-1',
       name: 'CMTV',
@@ -1019,7 +1071,6 @@ videoEl.addEventListener('error', () => {
   ];
 
   demoChannels.forEach(ch => channels.push(ch)); */
-
   // Overlays custom
   const customOverlays = [
     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "//popcdn.day/player.php?stream=CMTVPT" },
