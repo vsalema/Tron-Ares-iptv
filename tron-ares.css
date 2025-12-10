@@ -36,7 +36,6 @@ body.theme-redblue {
   box-sizing: border-box;
 }
 
-
 html,
 body {
   margin: 0;
@@ -45,11 +44,10 @@ body {
   overflow: hidden; /* la fenêtre ne scrolle plus, seulement les listes internes */
 }
 
+/* L'app occupe toute la hauteur de l’écran */
 .app-shell {
-  height: 100vh; /* l'app occupe toute la hauteur de l’écran */
+  height: 100vh;
 }
-
-
 
 body {
   margin: 0;
@@ -65,8 +63,9 @@ body {
 .app-shell {
   display: flex;
   flex: 1;
-  max-width: 1400px;
-  margin: 12px;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
   border-radius: 24px;
   background: linear-gradient(145deg, rgba(0, 8, 20, 0.96), rgba(0, 0, 0, 0.98));
   border: 1px solid rgba(0, 229, 255, 0.12);
@@ -144,6 +143,8 @@ body {
   color: var(--tron-text);
 }
 
+/* Tabs */
+
 .tabs {
   display: flex;
   padding: 6px 10px 4px;
@@ -215,6 +216,8 @@ body {
   z-index: 1;
 }
 
+/* Channel items */
+
 .channel-item {
   position: relative;
   display: flex;
@@ -256,6 +259,7 @@ body {
   box-shadow: var(--shadow-neon);
   font-size: 15px;
   color: var(--tron-text);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .channel-logo img {
@@ -265,31 +269,14 @@ body {
   display: block;
 }
 
-.channel-logo {
-  width: 60px;
-  height: 33px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.9));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid rgba(0, 229, 255, 0.55);
-  box-shadow: var(--shadow-neon);
-  font-size: 15px;
-  color: var(--tron-text);
-  /* <<< AJOUTE ÇA */
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
-}
-
 /* Zoom logo seulement dans la liste principale channels */
 #channelList .channel-item:hover .channel-logo {
-  transform: scale(2.12);
+  transform: scale(2.12) translateX(18px);
+  transform-origin: left center;
   box-shadow: var(--shadow-neon-amber);
   border-color: var(--tron-accent);
+  z-index: 5;
 }
-
 
 .channel-meta {
   flex: 1;
@@ -370,6 +357,8 @@ body {
   text-shadow: 0 0 8px rgba(255, 145, 0, 0.8);
 }
 
+/* Loader panel */
+
 .loader-panel {
   border-top: 1px solid rgba(0, 229, 255, 0.18);
   padding: 8px 10px 9px;
@@ -401,6 +390,8 @@ body {
   gap: 4px;
   align-items: center;
 }
+
+/* Inputs & buttons */
 
 .input {
   flex: 1;
@@ -1020,36 +1011,29 @@ video {
     height: 130px;
   }
 }
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative; /* important pour positionner le banner */
-}
 
-/* Conteneur du banner, centré au milieu de la top-bar */
+/* Variante bannière ; si tu veux vraiment cette version là */
 .top-bar-banner {
   position: absolute;
   left: 5%;
   top: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: none;   /* pour ne pas bloquer les clics sur les boutons derrière au cas où */
-  z-index: 0;             /* ou 1 si tu veux qu'il passe devant */
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Ton banner avec la hauteur que TU as choisie */
 .banner-img {
-  height: 78px;         /* ta valeur */
+  height: 78px;
   width: auto;
   filter: drop-shadow(0 0 8px var(--tron-border));
   transition: 0.25s ease-out;
 }
 
-/* petit effet au survol, si tu veux le rendre cliquable enlève pointer-events:none */
 .banner-img:hover {
   transform: scale(1.03);
   filter: drop-shadow(0 0 16px var(--tron-accent));
 }
+
 @media (max-width: 540px) {
   .banner-img {
     height: 52px;
@@ -1076,6 +1060,8 @@ video {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  position: relative;
+  padding-right: 18px;
 }
 
 .loader-toggle-icon {
@@ -1101,15 +1087,8 @@ video {
   transform: rotate(90deg);
   opacity: 1;
 }
-/* --- Icône lumineuse TRON pour les sections ouvertes --- */
 
-/* Positionne l’icône à droite du titre */
-.collapsible-label {
-  position: relative;
-  padding-right: 18px;
-}
-
-/* Le petit cercle lumineux */
+/* Icône lumineuse TRON pour les sections ouvertes */
 .collapsible-label::after {
   content: "";
   position: absolute;
@@ -1119,17 +1098,17 @@ video {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(0, 229, 255, 0.25); /* discret quand fermé */
+  background: rgba(0, 229, 255, 0.25);
   box-shadow: 0 0 4px rgba(0, 229, 255, 0.4);
   transition: 0.25s ease-out;
 }
 
-/* Mode ouvert = halo Tron plus puissant */
 .loader-section.open .collapsible-label::after {
   background: rgba(255, 68, 0, 0.9);
   box-shadow: 0 0 10px rgba(255, 68, 0, 0.9), 0 0 18px rgba(0, 212, 255, 0.9);
   transform: translateY(-50%) scale(1.25);
 }
+
 /* Masquer le banner TRON en mode portrait mobile */
 @media screen and (max-width: 600px) and (orientation: portrait) {
   .top-bar-banner,
@@ -1141,21 +1120,21 @@ video {
 /* Conteneur des onglets (aside) */
 .tabs {
   display: flex;
-  flex-wrap: wrap;          /* permet le retour à la ligne */
-  gap: 6px;                 /* espace entre les boutons */
+  flex-wrap: wrap;
+  gap: 6px;
   justify-content: center;
   margin-bottom: 8px;
 }
 
 /* Boutons d'onglets */
 .tabs .tab-btn {
-  flex: 1 1 calc(50% - 6px); /* 2 boutons par ligne */
-  min-width: 0;              /* évite les débordements */
+  flex: 1 1 calc(50% - 6px);
+  min-width: 0;
   text-align: center;
   padding: 6px 4px;
-  font-size: 11px;           /* un peu plus compact */
+  font-size: 11px;
   line-height: 1.2;
-  white-space: nowrap;       /* si tu veux éviter les retours à la ligne interne */
+  white-space: nowrap;
 }
 
 /* Optionnel : sur très petit écran, 1 bouton par ligne */
@@ -1164,6 +1143,7 @@ video {
     flex: 1 1 100%;
   }
 }
+
 /* Effet TRON autour des logos */
 .channel-logo img,
 .np-logo img {
@@ -1179,6 +1159,7 @@ video {
     drop-shadow(0 0 10px var(--tron-accent))
     drop-shadow(0 0 18px var(--tron-accent-soft));
 }
+
 /* Animation Tron pulsée */
 @keyframes tronLogoPulse {
   0% {
@@ -1202,6 +1183,7 @@ video {
 .np-logo img {
   animation: tronLogoPulse 3.4s infinite ease-in-out;
 }
+
 body.theme-redblue .channel-logo img,
 body.theme-redblue .np-logo img {
   animation: tronLogoPulseRB 3.4s infinite ease-in-out;
@@ -1224,12 +1206,343 @@ body.theme-redblue .np-logo img {
       drop-shadow(0 0 14px rgba(41,121,255,0.5));
   }
 }
-/* Zoom spécial films : scale 2.12 + décalage vers la droite */
-#channelList .channel-item:hover .channel-logo {
-  transform: scale(2.12) translateX(18px); /* <<< zoom + pousser à droite */
-  transform-origin: left center;           /* le zoom part du côté gauche */
-  box-shadow: var(--shadow-neon-amber);
-  border-color: var(--tron-accent);
-  z-index: 5;                              /* reste au-dessus */
+
+/* Bloc tracks dans le now-playing */
+.np-tracks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
 }
 
+/* Groupe bouton + menu */
+.np-track-group {
+  position: relative;
+}
+
+/* Bouton audio / sous-titres dans le NP */
+.np-track-btn {
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  padding: 0;
+}
+
+/* Menu pistes (audio / sous-titres) */
+
+.np-track-menu {
+  position: fixed;
+  right: 395px;
+  bottom: 110px;
+  min-width: 220px;
+  max-width: 260px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 229, 255, 0.6);
+  background: radial-gradient(circle at top,
+    rgba(3, 18, 36, 0.98),
+    rgba(0, 0, 0, 0.98)
+  );
+  box-shadow:
+    0 0 18px rgba(0, 229, 255, 0.45),
+    0 0 26px rgba(255, 145, 0, 0.35);
+  font-size: 11px;
+  z-index: 60;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.18s ease-out,
+              transform 0.18s ease-out;
+}
+
+.np-track-menu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.np-track-menu-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--tron-muted);
+  margin-bottom: 4px;
+}
+
+.np-track-item {
+  padding: 5px 7px;
+  border-radius: 10px;
+  margin: 2px 0;
+  cursor: pointer;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  transition: 0.15s ease-out;
+}
+
+.np-track-item:hover {
+  border-color: var(--tron-accent-soft);
+  box-shadow: var(--shadow-neon-amber);
+}
+
+.np-track-item.active {
+  border-color: var(--tron-accent);
+  background: radial-gradient(circle at left,
+    rgba(255, 145, 0, 0.25),
+    rgba(0, 0, 0, 0.9)
+  );
+}
+
+.np-track-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-track-item-meta {
+  font-size: 9px;
+  color: var(--tron-muted);
+}
+
+.np-track-btn.active {
+  border-color: var(--tron-accent);
+  color: var(--tron-accent-soft);
+  box-shadow: 0 0 10px var(--tron-accent);
+}
+
+/* Mobile : bottom-sheet centré, bien visible */
+@media (max-width: 768px) {
+  .np-track-menu {
+    left: 10px;
+    right: 10px;
+    bottom: 90px;
+    max-width: none;
+  }
+}
+
+/* Mobile en mode paysage : sidebar jusqu'au haut du now-playing */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+  .sidebar {
+    top: 0;
+    bottom: 90px;
+    height: auto;
+  }
+}
+
+/* =========================================
+   FIX MOBILE PAYSAGE (S24 & co)
+   On se base sur la HAUTEUR de l'écran
+   ========================================= */
+@media screen and (max-height: 520px) and (orientation: landscape) {
+
+  html,
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .main {
+    flex: 1 0 auto;
+    padding: 4px 8px;
+  }
+
+  .top-bar {
+    margin-bottom: 4px;
+  }
+
+  .player-shell {
+    flex: 0 0 auto;
+    height: 52vh;
+    min-height: 0;
+  }
+
+  .bottom-bar {
+    margin-top: 4px;
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 90px;
+    height: auto;
+    max-height: none;
+    max-width: 80vw;
+    z-index: 50;
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+
+  .loader-panel {
+    display: none !important;
+  }
+
+  .lists-container {
+    height: 100%;
+  }
+}
+
+/* FORCE APP-SHELL FULL WIDTH ON DESKTOP */
+@media (min-width: 1025px) {
+  #appShell,
+  .app-shell {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+  }
+}
+/* Barre de recherche globale dans la sidebar */
+.search-row {
+  padding: 0 10px 6px;
+}
+
+.search-input {
+  font-size: 11px;
+}
+/* Conteneur pour placer le bouton dans l’input */
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Bouton TRON ✖ */
+.clear-search-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 229, 255, 0.0); /* presque invisible au repos */
+  background: radial-gradient(circle at 30% 20%,
+              rgba(0, 229, 255, 0.8),
+              rgba(0, 0, 0, 0.95));
+  color: var(--tron-bg);
+  font-size: 11px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.18s ease-out;
+  box-shadow: none;
+}
+
+/* Quand il y a du texte, le noyau TRON s’allume et pulse */
+.search-wrapper.has-text .clear-search-btn {
+  visibility: visible;
+  opacity: 0.9;
+  border-color: rgba(0, 229, 255, 0.8);
+  color: var(--tron-text);
+  box-shadow:
+    0 0 6px rgba(0, 229, 255, 0.7),
+    0 0 14px rgba(255, 145, 0, 0.6);
+  animation: tronClearPulse 2.2s infinite ease-in-out;
+}
+
+/* Survol = boost orange */
+.clear-search-btn:hover {
+  opacity: 1;
+  border-color: var(--tron-accent);
+  color: var(--tron-accent-soft);
+  box-shadow:
+    0 0 10px rgba(255, 145, 0, 0.9),
+    0 0 20px rgba(0, 229, 255, 0.9);
+  animation-duration: 1.3s;
+}
+@keyframes tronClearPulse {
+  0% {
+    transform: translateY(-50%) scale(0.9);
+    box-shadow:
+      0 0 4px rgba(0, 229, 255, 0.4),
+      0 0 8px rgba(255, 145, 0, 0.3);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow:
+      0 0 10px rgba(0, 229, 255, 0.9),
+      0 0 20px rgba(255, 145, 0, 0.8);
+  }
+  100% {
+    transform: translateY(-50%) scale(0.95);
+    box-shadow:
+      0 0 5px rgba(0, 229, 255, 0.6),
+      0 0 10px rgba(255, 145, 0, 0.5);
+  }
+}
+/* ============================================
+   SCROLLBAR TRON ARES (toutes les listes .list)
+   ============================================ */
+
+.list {
+  scrollbar-width: thin;                 /* Firefox */
+  scrollbar-color: var(--tron-border) transparent;
+}
+
+/* Chrome / Edge / Safari */
+.list::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 229, 255, 0.15);
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 229, 255, 0.8),
+    rgba(255, 145, 0, 0.75)
+  );
+  border-radius: 10px;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+  transition: 0.25s ease;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 145, 0, 0.9),
+    rgba(0, 229, 255, 0.85)
+  );
+  box-shadow:
+    0 0 10px rgba(255, 145, 0, 0.9),
+    0 0 14px rgba(0, 229, 255, 0.8);
+}
+
+/* Scrollbar plus fine sur mobile */
+@media (max-width: 700px) {
+  .list::-webkit-scrollbar {
+    width: 6px;
+  }
+}

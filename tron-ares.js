@@ -1,8 +1,8 @@
 // =====================================================
-// TRON ARES IPTV PLAYER - JS CLEAN
+// TRON ARES IPTV PLAYER - JS CLEAN + RESUME + TRACKS
 // =====================================================
 
-// --------- DATA MODEL ---------
+// --------- RESUME POSITIONS (CHANNELS SEULEMENT) ---------
 let resumePositions = {};
 
 try {
@@ -11,7 +11,19 @@ try {
 } catch {
   resumePositions = {};
 }
+// --- RECHERCHE GLOBALE ---
+let currentSearch = '';
 
+function matchesSearch(entry) {
+  if (!currentSearch) return true;
+  const q = currentSearch.toLowerCase();
+  return (
+    (entry.name && entry.name.toLowerCase().includes(q)) ||
+    (entry.group && entry.group.toLowerCase().includes(q))
+  );
+}
+
+// --------- DATA MODEL ---------
 const channels = [];      // Liste M3U principale
 const frChannels = [];    // Liste M3U FR
 const iframeItems = [];   // Overlays / iFrames
@@ -28,6 +40,9 @@ let dashInstance = null;
 
 let currentEntry = null;
 let externalFallbackTried = false;
+// --- ÉTAT PISTES (pour l'aspect "actif" des boutons NP) ---
+let activeAudioIndex = -1;
+let activeSubtitleIndex = -1;
 
 // --------- DOM REFS ---------
 const videoEl = document.getElementById('videoEl');
@@ -74,6 +89,21 @@ const nextBtn = document.getElementById('nextBtn');
 const fxToggleBtn = document.getElementById('fxToggleBtn');
 const pipToggleBtn = document.getElementById('pipToggleBtn');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+// --- Nouveaux contrôles pistes (dans now-playing) ---
+const npTracks = document.getElementById('npTracks');
+const audioGroup = document.getElementById('audioGroup');
+const subtitleGroup = document.getElementById('subtitleGroup');
+const audioTrackBtn = document.getElementById('audioTrackBtn');
+const subtitleTrackBtn = document.getElementById('subtitleTrackBtn');
+const audioTrackMenu = document.getElementById('audioTrackMenu');
+const subtitleTrackMenu = document.getElementById('subtitleTrackMenu');
+
+
+// Masquer les contrôles pistes au démarrage
+if (npTracks) {
+  npTracks.classList.add('hidden');
+}
 
 // =====================================================
 // UTILS
@@ -122,6 +152,10 @@ function youtubeToEmbed(url) {
     return url;
   }
 }
+function isMovieContext() {
+  // Ici tu peux raffiner plus tard (ex: group = "FILMS" etc.)
+  return currentListType === 'channels';
+}
 
 // =====================================================
 // RENDERING
@@ -136,26 +170,32 @@ function renderLists() {
 
 function renderChannelFrList() {
   channelFrListEl.innerHTML = '';
-  frChannels.forEach((ch, idx) => {
-    const el = createChannelElement(ch, idx, 'fr');
-    channelFrListEl.appendChild(el);
-  });
+  frChannels
+    .filter(matchesSearch)
+    .forEach((ch, idx) => {
+      const el = createChannelElement(ch, idx, 'fr');
+      channelFrListEl.appendChild(el);
+    });
 }
 
 function renderChannelList() {
   channelListEl.innerHTML = '';
-  channels.forEach((ch, idx) => {
-    const el = createChannelElement(ch, idx, 'channels');
-    channelListEl.appendChild(el);
-  });
+  channels
+    .filter(matchesSearch)
+    .forEach((ch, idx) => {
+      const el = createChannelElement(ch, idx, 'channels');
+      channelListEl.appendChild(el);
+    });
 }
 
 function renderIframeList() {
   iframeListEl.innerHTML = '';
-  iframeItems.forEach((item, idx) => {
-    const el = createChannelElement(item, idx, 'iframe');
-    iframeListEl.appendChild(el);
-  });
+  iframeItems
+    .filter(matchesSearch)
+    .forEach((item, idx) => {
+      const el = createChannelElement(item, idx, 'iframe');
+      iframeListEl.appendChild(el);
+    });
 }
 
 function renderFavoritesList() {
@@ -165,7 +205,7 @@ function renderFavoritesList() {
     ...channels.filter(c => c.isFavorite),
     ...frChannels.filter(c => c.isFavorite),
     ...iframeItems.filter(i => i.isFavorite)
-  ];
+  ].filter(matchesSearch);
 
   favs.forEach((entry, idx) => {
     const el = createChannelElement(
@@ -276,7 +316,8 @@ function createChannelElement(entry, index, sourceType) {
 
   return li;
 }
-
+const globalSearchInput = document.getElementById('globalSearchInput');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
 // =====================================================
 // NOW PLAYING BAR
 // =====================================================
@@ -308,13 +349,212 @@ function updateNowPlaying(entry, modeLabel) {
 }
 
 // =====================================================
+// PISTES AUDIO / SOUS-TITRES (HLS) - CHANNELLIST SEULEMENT
+// =====================================================
+
+function closeAllTrackMenus() {
+  audioTrackMenu?.classList.remove('open');
+  subtitleTrackMenu?.classList.remove('open');
+}
+
+function buildAudioTrackMenu() {
+  if (!audioTrackMenu || !hlsInstance || !isMovieContext()) return;
+
+  const tracks = hlsInstance.audioTracks || [];
+  audioTrackMenu.innerHTML = '';
+
+  if (!tracks.length) return;
+
+  const header = document.createElement('div');
+  header.className = 'np-track-menu-header';
+  header.textContent = 'Pistes audio';
+  audioTrackMenu.appendChild(header);
+
+  tracks.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'np-track-item';
+    if (idx === hlsInstance.audioTrack) item.classList.add('active');
+
+    const label = document.createElement('div');
+    label.className = 'np-track-item-label';
+    label.textContent = t.name || t.lang || ('Piste ' + (idx + 1));
+
+    const meta = document.createElement('div');
+    meta.className = 'np-track-item-meta';
+    meta.textContent = (t.lang || '').toUpperCase();
+
+    item.append(label, meta);
+
+    item.addEventListener('click', () => {
+      hlsInstance.audioTrack = idx;
+      buildAudioTrackMenu();
+      closeAllTrackMenus();
+    });
+
+    audioTrackMenu.appendChild(item);
+  });
+}
+
+function buildSubtitleTrackMenu() {
+  if (!subtitleTrackMenu || !isMovieContext()) return;
+
+  subtitleTrackMenu.innerHTML = '';
+
+  let useHls = false;
+  let tracks = [];
+  let activeIndex = -1;
+
+  // 1) Sous-titres HLS
+  if (hlsInstance && Array.isArray(hlsInstance.subtitleTracks) && hlsInstance.subtitleTracks.length > 0) {
+    useHls = true;
+    tracks = hlsInstance.subtitleTracks;
+    activeIndex = hlsInstance.subtitleTrack; // -1 = off
+  } else {
+    // 2) Fallback : textTracks natifs du <video>
+    const tt = Array.from(videoEl.textTracks || []).filter(t =>
+      t.kind === 'subtitles' || t.kind === 'captions'
+    );
+    tracks = tt;
+    if (tt.length) {
+      activeIndex = tt.findIndex(t => t.mode === 'showing');
+    }
+  }
+
+  // Mémorise pour refreshTrackMenus()
+  activeSubtitleIndex = activeIndex;
+
+  const header = document.createElement('div');
+  header.className = 'np-track-menu-header';
+  header.textContent = 'Sous-titres';
+  subtitleTrackMenu.appendChild(header);
+
+  // Si aucune piste trouvée → on affiche juste "Aucun disponible"
+  if (!tracks.length) {
+    const empty = document.createElement('div');
+    empty.className = 'np-track-item';
+    empty.textContent = 'Aucun sous-titre disponible';
+    subtitleTrackMenu.appendChild(empty);
+    return;
+  }
+
+  // --- Option "Aucun" ---
+  const offItem = document.createElement('div');
+  offItem.className = 'np-track-item';
+  if (activeIndex === -1) offItem.classList.add('active');
+
+  const offLabel = document.createElement('div');
+  offLabel.className = 'np-track-item-label';
+  offLabel.textContent = 'Aucun';
+
+  offItem.appendChild(offLabel);
+  offItem.addEventListener('click', () => {
+    if (useHls && hlsInstance) {
+      hlsInstance.subtitleTrack = -1;
+    } else {
+      Array.from(videoEl.textTracks || []).forEach(t => {
+        if (t.kind === 'subtitles' || t.kind === 'captions') {
+          t.mode = 'disabled';
+        }
+      });
+    }
+    activeSubtitleIndex = -1;
+    buildSubtitleTrackMenu();
+    closeAllTrackMenus();
+  });
+  subtitleTrackMenu.appendChild(offItem);
+
+  // --- Liste des pistes ---
+  tracks.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'np-track-item';
+    if (idx === activeIndex) item.classList.add('active');
+
+    const label = document.createElement('div');
+    label.className = 'np-track-item-label';
+    label.textContent = t.name || t.label || t.lang || t.language || ('Sous-titres ' + (idx + 1));
+
+    const meta = document.createElement('div');
+    meta.className = 'np-track-item-meta';
+    meta.textContent = (t.lang || t.language || '').toUpperCase();
+
+    item.append(label, meta);
+
+    item.addEventListener('click', () => {
+      if (useHls && hlsInstance) {
+        hlsInstance.subtitleTrack = idx;
+      } else {
+        const vt = Array.from(videoEl.textTracks || []);
+        vt.forEach((track, i) => {
+          if (track.kind === 'subtitles' || track.kind === 'captions') {
+            track.mode = (i === idx ? 'showing' : 'disabled');
+          }
+        });
+      }
+      activeSubtitleIndex = idx;
+      buildSubtitleTrackMenu();
+      closeAllTrackMenus();
+    });
+
+    subtitleTrackMenu.appendChild(item);
+  });
+}
+
+
+
+
+function updateTrackControlsVisibility() {
+  if (!npTracks) return;
+
+  // On n’affiche les boutons que pour la liste principale (films)
+  if (!isMovieContext()) {
+    npTracks.classList.add('hidden');
+    return;
+  }
+
+  // On montre toujours le bloc et les deux boutons,
+  // même si on ne trouve pas encore de pistes.
+  npTracks.classList.remove('hidden');
+  audioGroup?.classList.remove('hidden');
+  subtitleGroup?.classList.remove('hidden');
+}
+
+
+function refreshTrackMenus() {
+  // reconstruit les menus
+  buildAudioTrackMenu();
+  buildSubtitleTrackMenu();
+  updateTrackControlsVisibility();
+
+  // recalcule l'index audio actif à partir de Hls
+  if (hlsInstance && Array.isArray(hlsInstance.audioTracks) && hlsInstance.audioTracks.length) {
+    activeAudioIndex = hlsInstance.audioTrack ?? -1;
+  } else {
+    activeAudioIndex = -1;
+  }
+
+  // Pour les sous-titres, activeSubtitleIndex est mis à jour dans buildSubtitleTrackMenu()
+
+  // On active/désactive le style des boutons
+  if (audioTrackBtn) {
+    audioTrackBtn.classList.toggle('active', activeAudioIndex !== -1);
+  }
+  if (subtitleTrackBtn) {
+    subtitleTrackBtn.classList.toggle('active', activeSubtitleIndex !== -1);
+  }
+}
+
+
+// =====================================================
 // PLAYER LOGIC
 // =====================================================
 
 function destroyHls() {
   if (hlsInstance) {
-    hlsInstance.destroy();
+    try { hlsInstance.destroy(); } catch (e) {}
     hlsInstance = null;
+  }
+  if (npTracks) {
+    npTracks.classList.add('hidden');
   }
 }
 
@@ -417,6 +657,27 @@ function playUrl(entry) {
     hlsInstance.attachMedia(videoEl);
     modeLabel = 'HLS';
 
+    // Brancher menus pistes
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+      refreshTrackMenus();
+    });
+
+    hlsInstance.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
+      refreshTrackMenus();
+    });
+
+    hlsInstance.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
+      refreshTrackMenus();
+    });
+
+    hlsInstance.on(Hls.Events.AUDIO_TRACK_SWITCHED, () => {
+      refreshTrackMenus();
+    });
+
+    hlsInstance.on(Hls.Events.SUBTITLE_TRACK_SWITCH, () => {
+      refreshTrackMenus();
+    });
+
     hlsInstance.on(Hls.Events.ERROR, (event, data) => {
       console.error('HLS error:', data);
       if (!externalFallbackTried && data.fatal && currentEntry) {
@@ -432,25 +693,27 @@ function playUrl(entry) {
       modeLabel = 'VIDEO';
     }
   }
-// Reprise lecture seulement si on vient de channelList
-videoEl.onloadedmetadata = () => {
-  try {
-    if (currentListType !== "channels") return; // <<< restriction ici
 
-    const key = entry.url;
-    const savedPos = resumePositions[key];
+  // Reprise lecture seulement si on vient de channelList
+  videoEl.onloadedmetadata = () => {
+    try {
+      if (currentListType !== 'channels') return;
 
-    if (
-      typeof savedPos === "number" &&
-      savedPos > 10 &&
-      isFinite(videoEl.duration) &&
-      savedPos < videoEl.duration - 5
-    ) {
-      videoEl.currentTime = savedPos;
+      const key = entry.url;
+      const savedPos = resumePositions[key];
+
+      if (
+        typeof savedPos === 'number' &&
+        savedPos > 10 &&
+        isFinite(videoEl.duration) &&
+        savedPos < videoEl.duration - 5
+      ) {
+        videoEl.currentTime = savedPos;
+      }
+    } catch (e) {
+      console.warn('Erreur reprise position', e);
     }
-  } catch (e) {
-    console.warn("Erreur reprise position", e);
-  }
+   refreshTrackMenus();
 };
 
   videoEl.play().catch(() => {});
@@ -863,14 +1126,69 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.list').forEach(l => l.classList.remove('active'));
 
-    if (tab === 'channels') channelListEl.classList.add('active');
-    if (tab === 'fr') channelFrListEl.classList.add('active');
-    if (tab === 'iframes') iframeListEl.classList.add('active');
+    if (tab === 'channels') currentListType = 'channels', channelListEl.classList.add('active');
+    if (tab === 'fr') currentListType = 'fr', channelFrListEl.classList.add('active');
+    if (tab === 'iframes') currentListType = 'iframe', iframeListEl.classList.add('active');
     if (tab === 'favorites') favoriteListEl.classList.add('active');
 
     scrollToActiveItem();
+    updateTrackControlsVisibility();
   });
 });
+// Recherche globale (toutes listes)
+if (globalSearchInput) {
+  globalSearchInput.addEventListener('input', () => {
+    currentSearch = globalSearchInput.value.trim().toLowerCase();
+    renderLists();
+    scrollToActiveItem(); // pour garder l’élément actif centré si possible
+  });
+}
+
+
+if (clearSearchBtn) {
+  clearSearchBtn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentSearch = '';
+    globalSearchInput.value = '';
+
+    const wrapper = globalSearchInput.closest('.search-wrapper');
+    if (wrapper) wrapper.classList.remove('has-text');
+
+    renderLists();
+    scrollToActiveItem();
+  });
+}
+// --- Recherche globale avec bouton effacer ---
+if (globalSearchInput) {
+  const wrapper = globalSearchInput.closest('.search-wrapper');
+
+  globalSearchInput.addEventListener('input', () => {
+    currentSearch = globalSearchInput.value.trim().toLowerCase();
+
+    // Afficher/masquer le bouton ✖
+    if (wrapper) {
+      if (globalSearchInput.value.length > 0) wrapper.classList.add('has-text');
+      else wrapper.classList.remove('has-text');
+    }
+
+    renderLists();
+    scrollToActiveItem();
+  });
+}
+
+if (clearSearchBtn) {
+  clearSearchBtn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentSearch = '';
+    globalSearchInput.value = '';
+
+    const wrapper = globalSearchInput.closest('.search-wrapper');
+    if (wrapper) wrapper.classList.remove('has-text');
+
+    renderLists();
+    scrollToActiveItem();
+  });
+}
 
 // Sections repliables du loader-panel
 document.querySelectorAll('.loader-section .collapsible-label').forEach(label => {
@@ -880,7 +1198,7 @@ document.querySelectorAll('.loader-section .collapsible-label').forEach(label =>
   });
 });
 
-// (optionnel) ouvrir par défaut la section playlist
+// Fermer (close) par défaut la section playlist (aucune ouverte)
 document.querySelector('.loader-section[data-section="playlist"]')?.classList.add('close');
 
 // Sidebar show/hide
@@ -1018,59 +1336,62 @@ videoEl.addEventListener('error', () => {
   npBadge.textContent = 'ERREUR';
   console.error('Video error', mediaError);
 });
-videoEl.addEventListener("timeupdate", () => {
-  if (currentListType !== "channels") return; // <<< seulement liste channels
+
+// Sauvegarde de la position (seulement channelList)
+videoEl.addEventListener('timeupdate', () => {
+  if (currentListType !== 'channels') return;
   if (!currentEntry) return;
 
   const key = currentEntry.url;
 
-  // Pas utile pour les flux live
   if (!videoEl.duration || !isFinite(videoEl.duration) || videoEl.duration < 60) return;
 
   const t = videoEl.currentTime;
   if (t < 10) return;
 
-  // Si le film est presque fini → on supprime la mémoire
   if (videoEl.duration - t < 20) {
     delete resumePositions[key];
     localStorage.setItem('tronAresResume', JSON.stringify(resumePositions));
     return;
   }
 
-  // Sauvegarde normale
   resumePositions[key] = t;
   localStorage.setItem('tronAresResume', JSON.stringify(resumePositions));
 });
+
+
+audioTrackBtn?.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  if (!isMovieContext()) return;
+  buildAudioTrackMenu();
+  const isOpen = audioTrackMenu.classList.toggle('open');
+  if (isOpen) {
+    subtitleTrackMenu?.classList.remove('open');
+  }
+});
+
+subtitleTrackBtn?.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  if (!isMovieContext()) return;
+  buildSubtitleTrackMenu();
+  const isOpen = subtitleTrackMenu.classList.toggle('open');
+  if (isOpen) {
+    audioTrackMenu?.classList.remove('open');
+  }
+});
+
+// Fermer les menus si on clique ailleurs
+document.addEventListener('click', () => {
+  closeAllTrackMenus();
+});
+
+
 
 // =====================================================
 // DEMO DE BASE + OVERLAYS CUSTOM
 // =====================================================
 
 (function seedDemo() {
-  /* const demoChannels = [
-    {
-      id: 'demo-1',
-      name: 'CMTV',
-      url: '//popcdn.day/player.php?stream=CMTVPT',
-      logo: { type: 'image', value: 'https://vsalema.github.io/StreamPilot-X-Studio-O/logos/cmtv.png' },
-      group: 'TV',
-      isIframe: true,
-      isFavorite: false,
-      listType: 'channels'
-    },
-    {
-      id: 'demo-2',
-      name: 'SIC Noticias',
-      url: 'https://cdnapisec.kaltura.com/p/4526593/sp/4526593/playManifest/entryId/1_j8ztwihx/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8',
-      logo: { type: 'image', value: 'https://vsalema.github.io/tvpt4/css/SICNoticias.png' },
-      group: 'TV',
-      isIframe: false,
-      isFavorite: false,
-      listType: 'channels'
-    }
-  ];
-
-  demoChannels.forEach(ch => channels.push(ch)); */
   // Overlays custom
   const customOverlays = [
     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "//popcdn.day/player.php?stream=CMTVPT" },

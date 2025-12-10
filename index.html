@@ -24,17 +24,24 @@
     </div>
 <div class="tabs">
   <button class="tab-btn active" data-tab="channels">
-    <span>🎥</span> Film M3U
+    <span>🎥</span>Film M3U
   </button>
   <button class="tab-btn" data-tab="fr">
-    <span>🇫🇷</span> Chaînes FR M3U
+    <span>🇫🇷</span>Chaînes FR M3U
   </button>
   <button class="tab-btn" data-tab="iframes">
-    <span>🇵🇹</span> port / iFrame
+    <span>■</span> 🇵🇹 port / iFrame
   </button>
   <button class="tab-btn" data-tab="favorites">
     <span>★</span> Favoris
   </button>
+</div>
+<div class="search-row">
+  <div class="search-wrapper">
+    <input id="globalSearchInput" class="input search-input"
+           placeholder="Rechercher (toutes listes)…" />
+    <button id="clearSearchBtn" class="clear-search-btn">✖</button>
+  </div>
 </div>
 
 <div class="lists-container">
@@ -156,13 +163,35 @@
       </button>
 
       <div class="now-playing" id="nowPlaying">
-        <div class="np-logo" id="npLogo"></div>
-        <div class="np-text">
-          <div class="np-title" id="npTitle">Aucune chaîne sélectionnée</div>
-          <div class="np-sub" id="npSub">Choisissez une chaîne dans la liste</div>
-        </div>
-        <div class="np-badge" id="npBadge">IDLE</div>
-      </div>
+  <div class="np-logo" id="npLogo"></div>
+  <div class="np-text">
+    <div class="np-title" id="npTitle">Aucune chaîne sélectionnée</div>
+    <div class="np-sub" id="npSub">Choisissez une chaîne dans la liste</div>
+  </div>
+  <div class="np-badge" id="npBadge">IDLE</div>
+
+  <!-- Nouveau bloc contrôles films (channelList) -->
+  <div class="np-tracks" id="npTracks">
+
+    <!-- Bouton Audio -->
+    <div class="np-track-group" id="audioGroup">
+      <button class="icon-btn np-track-btn" id="audioTrackBtn" title="Changer la piste audio">
+        🔊
+      </button>
+      <div class="np-track-menu" id="audioTrackMenu"></div>
+    </div>
+
+    <!-- Bouton Sous-titres -->
+    <div class="np-track-group" id="subtitleGroup">
+      <button class="icon-btn np-track-btn" id="subtitleTrackBtn" title="Sous-titres">
+        💬
+      </button>
+      <div class="np-track-menu" id="subtitleTrackMenu"></div>
+    </div>
+
+  </div>
+</div>
+
 
       <button class="nav-btn" id="nextBtn">
         Next
@@ -173,7 +202,8 @@
         Next / Prev changent la chaîne <span>M3U</span> active.
       </div>
     </footer>
-  </main>
+  
+</main>
 </div>
 
 <script src="tron-ares.js"></script>
