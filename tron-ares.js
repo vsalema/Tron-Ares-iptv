@@ -1394,7 +1394,7 @@ document.addEventListener('click', () => {
 (function seedDemo() {
   // Overlays custom
   const customOverlays = [
-    { title: "M6", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Logo_M6_%282020%2C_fond_clair%29.svg/langfr-330px-Logo_M6_%282020%2C_fond_clair%29.svg.png", url: "https://vsalema.github.io/M16/?https://tvradiozap.eu/tools/np-m3u8.php/m6hd" },
+ // { title: "M6", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Logo_M6_%282020%2C_fond_clair%29.svg/langfr-330px-Logo_M6_%282020%2C_fond_clair%29.svg.png", url: "https://vsalema.github.io/M16/?https://tvradiozap.eu/tools/np-m3u8.php/m6hd" },
     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "//popcdn.day/player.php?stream=CMTVPT" },
     { title: "TVI",  logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/TVI.png", url: "https://vsalema.github.io/tvi2/" },
     { title: "TVIR", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/tvir.jpg", url: "https://vsalema.github.io/tvi-reality/" },
