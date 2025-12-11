@@ -207,5 +207,20 @@
 </div>
 
 <script src="tron-ares.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('./sw.js')
+        .then((reg) => {
+          console.log('[SW] Enregistré avec succès', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('[SW] Erreur d’enregistrement', err);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
