@@ -1904,7 +1904,7 @@ document.addEventListener('click', () => closeAllTrackMenus());
 // =====================================================
 (function seedDemo() {
   const customOverlays = [
-     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "https://mut001.myluck1.top:8088/live/agrrrrr/playlist.m3u8?id=121119&pk=fc823d8f546e8bb32f64049208466e3cb7955ea395b6cd875d3a44ceb04427e157408a31d543cf0fe6a94ecfced869e7f30602679b2da4ffb43360112d9a2876" },
+     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "https://vsalema.github.io/tvpt4/css/cmtv.m3u8" },
     { title: "CMTV", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/cmtv.png", url: "//popcdn.day/player.php?stream=CMTVPT" },
     { title: "TVI",  logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/TVI.png", url: "https://vsalema.github.io/tvi2/" },
     { title: "TVIR", logo: "https://vsalema.github.io/StreamPilot-X-Studio-S/logos/tvir.jpg", url: "https://vsalema.github.io/tvi-reality/" },
