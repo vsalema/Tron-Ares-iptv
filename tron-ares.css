@@ -1751,4 +1751,12 @@ body.theme-redblue .np-logo img {
   align-items:center;
 }
 
+/* PRO+ Radio: l'overlay radio est injecté en JS (#radioOverlayLayer). Le panneau HTML #radioPanel reste caché. */
+#radioPanel{display:none !important;}
+/* Mobile fix: sidebar au-dessus de l'overlay radio */
+@media (max-width: 900px) {
+  .sidebar { z-index: 120; }
+  #radioOverlayLayer { z-index: 40 !important; }
+}
+
 

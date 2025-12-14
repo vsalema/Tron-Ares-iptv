@@ -1660,6 +1660,16 @@ function autoplayFirstInList(listType) {
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const prevTab = document.querySelector('.tab-btn.active')?.dataset?.tab || '';
+
+    // ✅ Même action que le bouton "⤺ Retour diffusion" du Radio Overlay
+    // (radioOverlayBackBtn) : stop radio + restore playback.
+    // Important : on évite l'autoplay automatique sur ce clic, sinon on écrase
+    // le flux restauré par la 1ère chaîne de l'onglet.
+    const radioOverlayOpen = !!radioOverlayLayer && radioOverlayLayer.style.display !== 'none';
+    const skipAutoplay = (radioOverlayOpen || radioPlaying);
+    if (skipAutoplay) {
+      stopRadioAndRestore();
+    }
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
@@ -1676,7 +1686,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     }
 
     // Auto-diffuse la première chaîne quand on change de liste
-    if (tab && tab !== prevTab) {
+    if (!skipAutoplay && tab && tab !== prevTab) {
       autoplayFirstInList(currentListType);
     }
 
