@@ -309,6 +309,26 @@ body {
   text-overflow: ellipsis;
 }
 
+.channel-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.channel-num {
+  flex: 0 0 auto;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--tron-muted);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+
 .channel-sub {
   font-size: 11px;
   color: var(--tron-muted);
@@ -828,6 +848,38 @@ video { object-fit: contain; }
   flex-shrink: 0;
 }
 
+.np-counter {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--tron-text);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 8ch; /* largeur réservée → pas de saut */
+  text-align: center;
+}
+
+/* Counter tick (Now Playing) */
+.np-counter.tick {
+  animation: npTick 220ms ease-out;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes npTick {
+  0%   { transform: translateY(1px); opacity: 0.72; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  60%  { opacity: 1; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.25)); }
+  100% { transform: translateY(0); opacity: 1; filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.15)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-counter.tick { animation: none; filter: none; }
+}
+
+
+
 .helper-text {
   font-size: 10px;
   color: var(--tron-muted);
@@ -854,6 +906,7 @@ video { object-fit: contain; }
   flex: 0 0 auto;
   min-width: 64px;
 }
+
 
 .np-track-group { position: relative; }
 

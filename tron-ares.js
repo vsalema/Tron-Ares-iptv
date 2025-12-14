@@ -83,6 +83,15 @@ const npLogo = document.getElementById('npLogo');
 const npTitle = document.getElementById('npTitle');
 const npSub = document.getElementById('npSub');
 const npBadge = document.getElementById('npBadge');
+const npCounter = document.getElementById('npCounter');
+
+// Counter: retire la classe d'animation une fois terminée (permet de rejouer l'effet à chaque update)
+if (npCounter) {
+  npCounter.addEventListener('animationend', (e) => {
+    if (e && e.animationName === 'npTick') npCounter.classList.remove('tick');
+  });
+}
+
 
 const sidebar = document.getElementById('sidebar');
 const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
@@ -580,6 +589,16 @@ function createChannelElement(entry, index, sourceType) {
   titleDiv.className = 'channel-title';
   titleDiv.textContent = normalizeName(entry.name);
 
+  // Numéro de chaîne (affichage)
+  const numDiv = document.createElement('div');
+  numDiv.className = 'channel-num';
+  numDiv.textContent = String(index + 1);
+
+  const titleRow = document.createElement('div');
+  titleRow.className = 'channel-title-row';
+  titleRow.appendChild(numDiv);
+  titleRow.appendChild(titleDiv);
+
   const subDiv = document.createElement('div');
   subDiv.className = 'channel-sub';
   subDiv.textContent = entry.group || (entry.isIframe ? 'Overlay / iFrame' : 'Flux M3U');
@@ -601,7 +620,7 @@ function createChannelElement(entry, index, sourceType) {
     tagsDiv.appendChild(ytTag);
   }
 
-  metaDiv.appendChild(titleDiv);
+  metaDiv.appendChild(titleRow);
   metaDiv.appendChild(subDiv);
   metaDiv.appendChild(tagsDiv);
 
@@ -691,6 +710,110 @@ function updateNowPlaying(entry, modeLabel) {
   npBadge.textContent = modeLabel;
 }
 
+
+
+function _entryMatch(a, b) {
+  if (!a || !b) return false;
+  if (a.id && b.id && a.id === b.id) return true;
+  if (a.url && b.url && a.url === b.url) return true;
+  return false;
+}
+
+function syncPlaybackPositionFromEntry() {
+  if (!currentEntry) return;
+
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset?.tab || currentListType || '';
+
+  const tryList = (type) => {
+    if (type === 'favorites') {
+      const idx = favoritesView?.findIndex(x => _entryMatch(x?.entry, currentEntry)) ?? -1;
+      if (idx >= 0) {
+        currentListType = 'favorites';
+        currentFavPos = idx;
+        return true;
+      }
+    }
+
+    if (type === 'fr') {
+      const idx = frChannels.findIndex(x => _entryMatch(x, currentEntry));
+      if (idx >= 0) {
+        currentListType = 'fr';
+        currentFrIndex = idx;
+        return true;
+      }
+    }
+
+    if (type === 'iframe') {
+      const idx = iframeItems.findIndex(x => _entryMatch(x, currentEntry));
+      if (idx >= 0) {
+        currentListType = 'iframe';
+        currentIframeIndex = idx;
+        return true;
+      }
+    }
+
+    if (type === 'channels') {
+      const idx = channels.findIndex(x => _entryMatch(x, currentEntry));
+      if (idx >= 0) {
+        currentListType = 'channels';
+        currentIndex = idx;
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  // 1) Priorité à l’onglet actif
+  if (tryList(activeTab)) return;
+
+  // 2) Puis au type courant
+  if (tryList(currentListType)) return;
+
+  // 3) Fallback: cherche partout
+  if (tryList('fr')) return;
+  if (tryList('channels')) return;
+  if (tryList('iframe')) return;
+  tryList('favorites');
+}
+
+function updateNowPlayingCounter() {
+  if (!npCounter) return;
+
+  // Synchronise indices/type à partir de currentEntry (robuste, même si playUrl() est appelé directement)
+  syncPlaybackPositionFromEntry();
+
+  let pos = 0;
+  let total = 0;
+
+  if (currentListType === 'favorites') {
+    total = favoritesView?.length || 0;
+    pos = currentFavPos >= 0 ? (currentFavPos + 1) : 0;
+  } else if (currentListType === 'fr') {
+    total = frChannels.length;
+    pos = currentFrIndex >= 0 ? (currentFrIndex + 1) : 0;
+  } else if (currentListType === 'iframe') {
+    total = iframeItems.length;
+    pos = currentIframeIndex >= 0 ? (currentIframeIndex + 1) : 0;
+  } else {
+    total = channels.length;
+    pos = currentIndex >= 0 ? (currentIndex + 1) : 0;
+  }
+
+  const newText = total ? `${pos}/${total}` : '-/-';
+  if (npCounter.textContent !== newText) {
+    npCounter.textContent = newText;
+    // Tick animation sans reflow de layout (transform/opacity seulement)
+    npCounter.classList.remove('tick');
+    void npCounter.offsetWidth; // restart animation
+    npCounter.classList.add('tick');
+  }
+}
+
+
+
+
+
 // =====================================================
 // PISTES AUDIO / SOUS-TITRES (HLS) - MOVIE CONTEXT
 // =====================================================
@@ -700,33 +823,21 @@ function closeAllTrackMenus() {
 }
 
 function buildAudioTrackMenu() {
-  if (!audioTrackMenu) return;
+  if (!audioTrackMenu || !hlsInstance || !isMovieContext()) return;
 
+  const tracks = hlsInstance.audioTracks || [];
   audioTrackMenu.innerHTML = '';
-
-  // En dehors du contexte "films", on ne montre rien
-  if (!isMovieContext()) return;
+  if (!tracks.length) return;
 
   const header = document.createElement('div');
   header.className = 'np-track-menu-header';
   header.textContent = 'Pistes audio';
   audioTrackMenu.appendChild(header);
 
-  const tracks = (hlsInstance && Array.isArray(hlsInstance.audioTracks)) ? hlsInstance.audioTracks : [];
-
-  // Pas encore prêt / pas de pistes
-  if (!tracks.length) {
-    const empty = document.createElement('div');
-    empty.className = 'np-track-item';
-    empty.textContent = hlsInstance ? 'Aucune piste audio disponible' : 'Chargement…';
-    audioTrackMenu.appendChild(empty);
-    return;
-  }
-
   tracks.forEach((t, idx) => {
     const item = document.createElement('div');
     item.className = 'np-track-item';
-    if (hlsInstance && idx === hlsInstance.audioTrack) item.classList.add('active');
+    if (idx === hlsInstance.audioTrack) item.classList.add('active');
 
     const label = document.createElement('div');
     label.className = 'np-track-item-label';
@@ -738,7 +849,6 @@ function buildAudioTrackMenu() {
 
     item.append(label, meta);
     item.addEventListener('click', () => {
-      if (!hlsInstance) return;
       hlsInstance.audioTrack = idx;
       buildAudioTrackMenu();
       closeAllTrackMenus();
@@ -880,14 +990,15 @@ function destroyHls() {
     hlsInstance = null;
   }
 
-  // ⚠️ Important : ne pas masquer #npTracks ici.
+  // Important : ne pas masquer #npTracks ici.
   // Sinon, à chaque changement de chaîne (Next/Prev), le bloc disparaît puis réapparaît
-  // quand le manifest HLS est prêt → effet de "saut" des boutons Audio / Sous-titres.
+  // quand le manifest est prêt → effet de "saut" des boutons Audio / Sous-titres.
   closeAllTrackMenus();
   activeAudioIndex = -1;
   activeSubtitleIndex = -1;
   updateTrackControlsVisibility();
 }
+
 
 function destroyDash() {
   if (dashInstance) {
@@ -915,6 +1026,8 @@ function playEntryAsOverlay(entry) {
 
   currentEntry = entry;
   activePlaybackMode = 'iframe';
+
+  updateNowPlayingCounter();
 
   let url = entry.url;
 
@@ -944,6 +1057,10 @@ function fallbackToExternalPlayer(entry) {
   if (!entry || !entry.url) return;
 
   showIframe();
+
+  currentEntry = entry;
+  updateNowPlayingCounter();
+
   const base = 'https://vsalema.github.io/play/?';
   if (iframeEl) iframeEl.src = base + encodeURIComponent(entry.url);
 
@@ -970,6 +1087,7 @@ function playUrl(entry) {
   currentEntry = entry;
   // Met à jour tout de suite l'affichage des contrôles pistes (évite tout clignotement)
   updateTrackControlsVisibility();
+  updateNowPlayingCounter();
   activePlaybackMode = 'stream';
   externalFallbackTried = false;
 
@@ -1499,9 +1617,49 @@ function importFromJson() {
 // EVENTS
 // =====================================================
 
+
+function autoplayFirstInList(listType) {
+  // Ne pas interrompre la mini-radio si elle est en lecture
+  if (typeof radioPlaying !== 'undefined' && radioPlaying) return;
+
+  if (listType === 'favorites') {
+    renderFavoritesList();
+    if (!favoritesView.length) return;
+
+    currentListType = 'favorites';
+    currentFavPos = 0;
+
+    const item = favoritesView[0];
+    if (!item) return;
+
+    playUrl(item.entry);
+    renderFavoritesList();
+    scrollToActiveItem();
+    return;
+  }
+
+  if (listType === 'fr') {
+    if (!frChannels.length) return;
+    playFrChannel(0);
+    return;
+  }
+
+  if (listType === 'iframe') {
+    if (!iframeItems.length) return;
+    playIframe(0);
+    return;
+  }
+
+  // channels
+  if (!channels.length) return;
+  playChannel(0);
+}
+
+
 // Onglets
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    const prevTab = document.querySelector('.tab-btn.active')?.dataset?.tab || '';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
@@ -1517,7 +1675,13 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       renderFavoritesList();
     }
 
+    // Auto-diffuse la première chaîne quand on change de liste
+    if (tab && tab !== prevTab) {
+      autoplayFirstInList(currentListType);
+    }
+
     scrollToActiveItem();
+    updateNowPlayingCounter();
     updateTrackControlsVisibility();
   });
 });
